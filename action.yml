@@ -1,0 +1,47 @@
+name: 'Git deployments using SSH'
+description: 'SSH deployment - requires bash and ssh'
+inputs:
+  ssh_host:
+    description: 'SSH host'
+    required: true
+  ssh_user:
+    description: 'SSH username'
+    required: true
+  ssh_private_key:
+    description: 'SSH private key (raw text)'
+    required: true
+  ssh_port:
+    description: 'SSH port'
+    required: false
+    default: '22'
+  target_dir:
+    description: 'Application directory on remote server'
+    required: true
+  git_remote:
+    description: 'Git remote to use'
+    required: false
+  git_branch:
+    description: 'Git branch to use'
+    required: false
+  callback:
+    description: "Shell command to execute after deployment, workdir being the application's directory on remote server"
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Extract current branch name (used if git_branch is not provided)'
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      shell: bash
+      id: extract_branch
+    - name: Deploy
+      run: |
+        export SSH_HOST="${{ inputs.ssh_host }}" && \
+        export SSH_USER="${{ inputs.ssh_user }}" && \
+        export SSH_PRIVATE_KEY="${{ inputs.ssh_private_key }}" && \
+        export SSH_PORT="${{ inputs.ssh_port || '22' }}" && \
+        export TARGET_DIR="${{ inputs.target_dir }}" && \
+        export GIT_REMOTE="${{ inputs.git_remote || 'origin' }}" && \
+        export GIT_BRANCH="${{ inputs.git_branch || steps.extract_branch.outputs.branch }}" && \
+        export DEPLOY_CALLBACK="${{ inputs.callback }}" && \
+        ${{ github.action_path }}/deploy.sh
+      shell: bash

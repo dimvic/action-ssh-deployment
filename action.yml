@@ -42,6 +42,9 @@ runs:
         export TARGET_DIR="${{ inputs.target_dir }}" && \
         export GIT_REMOTE="${{ inputs.git_remote || 'origin' }}" && \
         export GIT_BRANCH="${{ inputs.git_branch || steps.extract_branch.outputs.branch }}" && \
-        export DEPLOY_CALLBACK="${{ inputs.callback }}" && \
+        export DEPLOY_CALLBACK=$(cat << EndOfCallback
+        ${{ inputs.callback }}
+        EndOfCallback
+        ) && \
         ${{ github.action_path }}/deploy.sh
       shell: bash

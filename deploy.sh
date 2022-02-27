@@ -17,6 +17,6 @@ ssh "ssh://${SSH_USER}@${SSH_HOST}:${SSH_PORT}" -i ./identity -o "StrictHostKeyC
   cd \"$TARGET_DIR\" && \
   git fetch \"$GIT_REMOTE\" && \
   git reset --hard \"$GIT_REMOTE/$GIT_BRANCH\" && \
-  [[ ! -z "$DEPLOY_CALLBACK" ]] && eval $DEPLOY_CALLBACK \
+  [[ ! -z "$DEPLOY_CALLBACK" ]] && eval "$DEPLOY_CALLBACK" \
   "
 
